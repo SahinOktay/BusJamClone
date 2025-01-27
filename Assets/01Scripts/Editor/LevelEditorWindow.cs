@@ -8,11 +8,13 @@ using UnityEditor.Experimental.GraphView;
 
 public class LevelEditorWindow : EditorWindow
 {
+    private bool _dimensionsChanged = false;
     private LevelEditor _levelEditor;
     private LevelData _levelData;
     private const int _defaultTileWidth = 32;
     private int _levelCount;
     private Vector2 _busColorScrollPos;
+    private Vector2Int _newDimensions;
 
     public static LevelEditorWindow OpenWindow(LevelEditor editor)
     {
@@ -63,6 +65,7 @@ public class LevelEditorWindow : EditorWindow
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button(levelName, GUILayout.Width(EditorGUIUtility.currentViewWidth - 80)))
             {
+                _dimensionsChanged = false;
                 _levelData = new LevelData();
 
                 EditorJsonUtility.FromJsonOverwrite(
@@ -73,6 +76,7 @@ public class LevelEditorWindow : EditorWindow
                     _levelData
                 );
 
+                _newDimensions = _levelData.dimensions;
                 _levelEditor.SetupLevel(_levelData);
             }
             GUI.backgroundColor = Color.white;
@@ -92,6 +96,7 @@ public class LevelEditorWindow : EditorWindow
 
             if (isCurrentLevel)
             {
+                DrawGridDimentionFields();
                 DrawBusEdit();
             }
         }
@@ -108,6 +113,38 @@ public class LevelEditorWindow : EditorWindow
             AddNewLevel();
 
         GUI.backgroundColor = Color.white;
+    }
+
+    private void DrawGridDimentionFields()
+    {
+        EditorGUILayout.Space(5);
+        EditorGUILayout.BeginHorizontal();
+        if (!_dimensionsChanged) EditorGUI.BeginChangeCheck();
+
+        _newDimensions = new Vector2Int(
+            EditorGUILayout.IntField(
+                "Grid Width",
+                _newDimensions.x
+            ),
+            EditorGUILayout.IntField(
+                "Grid Height",
+                _newDimensions.y
+            )
+        );
+
+        if (!_dimensionsChanged) _dimensionsChanged = EditorGUI.EndChangeCheck();
+
+        if (_dimensionsChanged)
+        {
+            if (GUILayout.Button("Apply changes", GUILayout.Width(position.width * .3f)))
+            {
+                _dimensionsChanged = false;
+
+                _levelData.Resize(_newDimensions);
+                _levelEditor.SetupLevel(_levelData);
+            }
+        }
+        EditorGUILayout.EndHorizontal();
     }
 
     private void DrawBusEdit()
@@ -132,12 +169,14 @@ public class LevelEditorWindow : EditorWindow
         for (int i = 0; i < _levelData.busColors.Length; i++)
         {
             GUI.color = LevelEditor.ColorDatabase.GetColorConfig(_levelData.busColors[i]).color * 3;
-            if (GUILayout.Button("", GUILayout.Width(40), GUILayout.Height(40)))
+            GUI.contentColor = Color.black;
+            if (GUILayout.Button((i + 1).ToString(), GUILayout.Width(40), GUILayout.Height(40)))
             {
                 ColorPicker colorPicker = GetWindow<ColorPicker>();
                 colorPicker.ColorPickComplete += OnColorPick;
                 colorPicker.PickColor(i);
             }
+            GUI.contentColor = Color.white;
             GUI.color = Color.white;
 
             if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Trash"), GUILayout.Width(40)))
@@ -159,10 +198,12 @@ public class LevelEditorWindow : EditorWindow
 
     private void AddNewLevel()
     {
-        LevelData generatedData = LevelData.GenerateNewData();
+        _dimensionsChanged = false;
+        LevelData generatedData = LevelData.GenerateNewData(Vector2Int.one * 4);
         generatedData.level_number = ++_levelCount;
+        _newDimensions = generatedData.dimensions;
 
-        int tileCount = Constants.GridDimentions.x * Constants.GridDimentions.y;
+        int tileCount = generatedData.dimensions.x * generatedData.dimensions.y;
         generatedData.tileStatus = new bool[tileCount];
         for (int i = 0; i < tileCount; i++)
         {

@@ -12,7 +12,10 @@ public class LevelEditor : MonoBehaviour
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private Tile[] tiles;
     [SerializeField] private TileOccupantDatabase tileOccupantDatabase;
-
+    [SerializeField] private Transform fillerLeft;
+    [SerializeField] private Transform fillerMiddle;
+    [SerializeField] private Transform fillerRight;
+    [SerializeField] private Vector2Int _dimentions;
 
     public static bool Initialized {  get; private set; }
     public static ColorDatabase ColorDatabase {  get; private set; }
@@ -32,22 +35,30 @@ public class LevelEditor : MonoBehaviour
         UnloadLevel();
 
         Transform levelParent = new GameObject(_levelParentName).transform;
-        levelParent.transform.position = Constants.GridStartPoint;
+        _dimentions = levelData.dimensions;
+        fillerLeft.transform.position = Vector3.left * (_dimentions.x * Constants.TileSize * .5f);
+        fillerRight.transform.position = Vector3.right * (_dimentions.x * Constants.TileSize * .5f);
+        fillerMiddle.transform.position = Vector3.back * (_dimentions.y * Constants.TileSize);
+        levelParent.transform.position = new Vector3(
+            -_dimentions.x * (.5f * Constants.TileSize) + Constants.TileSize * .5f, 
+            0, 
+            -Constants.TileSize * .5f
+        );
         levelParent.transform.SetParent(transform);
         Tile spawnedTile;
 
-        tiles = new Tile[Constants.GridDimentions.x * Constants.GridDimentions.y];
+        tiles = new Tile[_dimentions.x * _dimentions.y];
         int tileIndex;
 
-        for (int y = 0; y < Constants.GridDimentions.y; y++)
+        for (int y = 0; y < _dimentions.y; y++)
         {
-            for (int x = 0; x < Constants.GridDimentions.x; x++)
+            for (int x = 0; x < _dimentions.x; x++)
             {
                 spawnedTile = ((GameObject)PrefabUtility.InstantiatePrefab(tilePrefab)).GetComponent<Tile>();
                 spawnedTile.transform.SetParent(levelParent);
-                spawnedTile.transform.localPosition = new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize);
+                spawnedTile.transform.localPosition = new Vector3(x * Constants.TileSize, 0, -y * Constants.TileSize);
 
-                tileIndex = y * Constants.GridDimentions.x + x;
+                tileIndex = y * _dimentions.x + x;
                 spawnedTile.isWalkable = levelData.tileStatus[tileIndex];
                 tiles[tileIndex] = spawnedTile;
 
@@ -55,7 +66,6 @@ public class LevelEditor : MonoBehaviour
             }
         }
 
-        Character currentCharacter;
         for (int i = 0; i < levelData.characters.Length; i++)
         {
             GetTile(levelData.characters[i].coordinates).SetOccupier(SpawnCharacter(levelData.characters[i].color));
@@ -81,17 +91,17 @@ public class LevelEditor : MonoBehaviour
         }
 
         Tile currentTile;
-        for (int y = 0; y < Constants.GridDimentions.y; y++)
+        for (int y = 0; y < _dimentions.y; y++)
         {
-            for (int x = 0; x < Constants.GridDimentions.x; x++)
+            for (int x = 0; x < _dimentions.x; x++)
             {
                 currentTile = GetTile(x, y);
-                if (y < Constants.GridDimentions.y - 1)
+                if (y < _dimentions.y - 1)
                 {
                     currentTile.up = GetTile(x, y + 1);
                 }
 
-                if (x < Constants.GridDimentions.x - 1)
+                if (x < _dimentions.x - 1)
                 {
                     currentTile.right = GetTile(x + 1, y);
                 }
@@ -133,22 +143,22 @@ public class LevelEditor : MonoBehaviour
 
     public Tile GetTile(int x, int y)
     {
-        return tiles[y * Constants.GridDimentions.x + x];
+        return tiles[y * _dimentions.x + x];
     }
 
     public Tile GetTile(Vector2Int vector)
     {
-        return tiles[vector.y * Constants.GridDimentions.x + vector.x];
+        return tiles[vector.y * _dimentions.x + vector.x];
     }
 
     public Vector2Int GetCoordinate(int index)
     {
-        return new Vector2Int(index % Constants.GridDimentions.x, index / Constants.GridDimentions.x);
+        return new Vector2Int(index % _dimentions.x, index / _dimentions.x);
     }
 
     public LevelData GetLevelData()
     {
-        LevelData newData = LevelData.GenerateNewData();
+        LevelData newData = LevelData.GenerateNewData(_dimentions);
         List<CharacterData> characterDatas = new List<CharacterData>();
         List<TunnelData> tunnelDatas = new List<TunnelData>();
 
@@ -184,9 +194,9 @@ public class LevelEditor : MonoBehaviour
 
     private void OnTileStatusChange()
     {
-        for (int y = 0; y < Constants.GridDimentions.y; y++)
+        for (int y = 0; y < _dimentions.y; y++)
         {
-            for (int x = 0; x < Constants.GridDimentions.x; x++)
+            for (int x = 0; x < _dimentions.x; x++)
             {
                 GetTile(x, y).SetupVisuals();
             }

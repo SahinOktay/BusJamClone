@@ -50,9 +50,9 @@ public class Tile : MonoBehaviour
         }
 
         TileVisualStatus visualConfig = visualConfigurations.FirstOrDefault(item =>
-            item.isWalkableUp == (up != null ? up.isWalkable : true) &&
+            item.isWalkableUp == (up != null ? up.isWalkable : false) &&
             item.isWalkableRight == (right != null ? right.isWalkable : false) &&
-            item.isWalkableDown == (down != null ? down.isWalkable : false) &&
+            item.isWalkableDown == (down != null ? down.isWalkable : true) &&
             item.isWalkableLeft == (left != null ? left.isWalkable : false)
         );
 

@@ -209,9 +209,9 @@ MonoBehaviour:
   walkable: {fileID: 2545410026979233168}
   unwalkable: {fileID: 2504314073260246850}
   visualConfigurations:
-  - isWalkableUp: 1
+  - isWalkableUp: 0
     isWalkableRight: 0
-    isWalkableDown: 0
+    isWalkableDown: 1
     isWalkableLeft: 0
     objectsToActivate:
     - {fileID: 4576519931770322587}
@@ -221,9 +221,9 @@ MonoBehaviour:
     isWalkableLeft: 0
     objectsToActivate:
     - {fileID: 8418834864995812422}
-  - isWalkableUp: 0
+  - isWalkableUp: 1
     isWalkableRight: 0
-    isWalkableDown: 1
+    isWalkableDown: 0
     isWalkableLeft: 0
     objectsToActivate:
     - {fileID: 6793690491881373130}
@@ -233,33 +233,33 @@ MonoBehaviour:
     isWalkableLeft: 1
     objectsToActivate:
     - {fileID: 2297383623196634140}
-  - isWalkableUp: 1
+  - isWalkableUp: 0
     isWalkableRight: 0
-    isWalkableDown: 0
+    isWalkableDown: 1
     isWalkableLeft: 1
     objectsToActivate:
     - {fileID: 5511965903956261797}
-  - isWalkableUp: 1
+  - isWalkableUp: 0
     isWalkableRight: 1
-    isWalkableDown: 0
+    isWalkableDown: 1
     isWalkableLeft: 0
     objectsToActivate:
     - {fileID: 219041553822342926}
-  - isWalkableUp: 0
-    isWalkableRight: 1
-    isWalkableDown: 1
-    isWalkableLeft: 0
-    objectsToActivate:
-    - {fileID: 649993865752914102}
-  - isWalkableUp: 0
-    isWalkableRight: 0
-    isWalkableDown: 1
-    isWalkableLeft: 1
-    objectsToActivate:
-    - {fileID: 2303363417336206064}
   - isWalkableUp: 1
     isWalkableRight: 1
     isWalkableDown: 0
+    isWalkableLeft: 0
+    objectsToActivate:
+    - {fileID: 649993865752914102}
+  - isWalkableUp: 1
+    isWalkableRight: 0
+    isWalkableDown: 0
+    isWalkableLeft: 1
+    objectsToActivate:
+    - {fileID: 2303363417336206064}
+  - isWalkableUp: 0
+    isWalkableRight: 1
+    isWalkableDown: 1
     isWalkableLeft: 1
     objectsToActivate:
     - {fileID: 3036981922989745559}
@@ -269,9 +269,9 @@ MonoBehaviour:
     isWalkableLeft: 0
     objectsToActivate:
     - {fileID: 5935672042077426387}
-  - isWalkableUp: 0
+  - isWalkableUp: 1
     isWalkableRight: 1
-    isWalkableDown: 1
+    isWalkableDown: 0
     isWalkableLeft: 1
     objectsToActivate:
     - {fileID: 5330699587601318501}

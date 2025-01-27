@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2387d499f68bff438f4015ea162450d, type: 3}
+  m_Name: ColorDatabase
+  m_EditorClassIdentifier: 
+  configs:
+  - gameLogicColor: 0
+    passiveCharMat: {fileID: 2100000, guid: 87431e71295295c48bc626508ba75af2, type: 2}
+    activeCharMat: {fileID: 2100000, guid: b905cbda029aa7249bd731317be75c45, type: 2}
+    busMat: {fileID: 0}
+  - gameLogicColor: 1
+    passiveCharMat: {fileID: 2100000, guid: e16eb4ffd8e514d46814307a4e28e6fd, type: 2}
+    activeCharMat: {fileID: 2100000, guid: 04c565d4bcb23dd43b2d5ebd4b079f2c, type: 2}
+    busMat: {fileID: 0}
+  - gameLogicColor: 2
+    passiveCharMat: {fileID: 2100000, guid: 5edae5dd1c3c40548aad32e9f31a8000, type: 2}
+    activeCharMat: {fileID: 2100000, guid: a61c48d6ee4ca8641a59b6ecb8e4f26d, type: 2}
+    busMat: {fileID: 0}
+  - gameLogicColor: 3
+    passiveCharMat: {fileID: 2100000, guid: 1430d7cc0f8840a4ba85cd7f6a244234, type: 2}
+    activeCharMat: {fileID: 2100000, guid: 4a81893c9c82db040ae81f754cc04f99, type: 2}
+    busMat: {fileID: 0}
+  - gameLogicColor: 4
+    passiveCharMat: {fileID: 2100000, guid: c222d83cbefdb7d40b83caa6b341e640, type: 2}
+    activeCharMat: {fileID: 2100000, guid: 8023405c108230b448b6948fcb85d753, type: 2}
+    busMat: {fileID: 0}
+  - gameLogicColor: 5
+    passiveCharMat: {fileID: 2100000, guid: 4b09f2a68b10cc34a9a957b3172ac0eb, type: 2}
+    activeCharMat: {fileID: 2100000, guid: bbd71896a06cda74b934917405615629, type: 2}
+    busMat: {fileID: 0}
+  - gameLogicColor: 6
+    passiveCharMat: {fileID: 2100000, guid: 3bcfa44271261774f846641a0beb633c, type: 2}
+    activeCharMat: {fileID: 2100000, guid: 9a08d37cc06db6e4d8e3a056cb4703e9, type: 2}
+    busMat: {fileID: 0}
+  - gameLogicColor: 7
+    passiveCharMat: {fileID: 2100000, guid: 1108136095d70e241802933e58203cfb, type: 2}
+    activeCharMat: {fileID: 2100000, guid: 33f0ecab0ed25254cbcbf7c3720edf52, type: 2}
+    busMat: {fileID: 0}

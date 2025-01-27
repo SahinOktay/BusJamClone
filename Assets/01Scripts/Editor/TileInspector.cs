@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
+using System.Linq;
 
-[CustomEditor(typeof(Tile))]
+[CustomEditor(typeof(Tile)), CanEditMultipleObjects]
 public class TileInspector : Editor
 {
-    private Tile _tile;
+    private Tile[] _tiles;
     public override VisualElement CreateInspectorGUI()
     {
-        _tile = (Tile)target;
+        Object[] objects = targets;
+        _tiles = objects.Select(item => item as Tile).ToArray();
         return base.CreateInspectorGUI();
     }
 
@@ -21,7 +23,10 @@ public class TileInspector : Editor
         if (EditorGUI.EndChangeCheck())
         {
             serializedObject.ApplyModifiedProperties();
-            _tile.StatusChange?.Invoke();
+            for (int i = 0; i < _tiles.Length; i++)
+            {
+                _tiles[i].StatusChange?.Invoke();
+            }
         }
 
         EditorGUILayout.PropertyField(serializedObject.FindProperty("visualConfigurations"));
@@ -35,21 +40,24 @@ public class TileInspector : Editor
         if (EditorGUI.EndChangeCheck())
         {
             serializedObject.ApplyModifiedProperties();
-            _tile.DestroyOccupier(true);
-
-            GameObject prefab = LevelEditor.TileOccupantDatabase.GetPrefab(_tile.occupantType);
-
-            if (prefab == null)
+            for (int i = 0; i < _tiles.Length; i++)
             {
-                _tile.SetOccupier(null);
+                _tiles[i].DestroyOccupier(true);
+                GameObject prefab = LevelEditor.TileOccupantDatabase.GetPrefab(_tiles[i].occupantType);
+
+                if (prefab == null)
+                {
+                    _tiles[i].SetOccupier(null);
+                }
+                else
+                {
+                    _tiles[i].SetOccupier(
+                        ((GameObject)PrefabUtility.InstantiatePrefab(prefab))
+                        .GetComponent<BaseTileOccupier>()
+                    );
+                }
             }
-            else
-            {
-                _tile.SetOccupier(
-                    ((GameObject)PrefabUtility.InstantiatePrefab(prefab))
-                    .GetComponent<BaseTileOccupier>()
-                );
-            }
+
         }
     }
 }

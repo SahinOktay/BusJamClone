@@ -13,8 +13,10 @@ public class LevelEditor : MonoBehaviour
     [SerializeField] private Tile[] tiles;
     [SerializeField] private TileOccupantDatabase tileOccupantDatabase;
 
-    public static TileOccupantDatabase TileOccupantDatabase {  get; private set; }
+
+    public static bool Initialized {  get; private set; }
     public static ColorDatabase ColorDatabase {  get; private set; }
+    public static TileOccupantDatabase TileOccupantDatabase {  get; private set; }
 
     private const string _levelParentName = "LevelParent";
 
@@ -22,6 +24,7 @@ public class LevelEditor : MonoBehaviour
     {
         TileOccupantDatabase = tileOccupantDatabase;
         ColorDatabase = colorDatabase;
+        Initialized = true;
     }
 
     public void SetupLevel(LevelData levelData)

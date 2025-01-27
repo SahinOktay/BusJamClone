@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.UIElements;
 using System.IO;
 using Rollic;
-using static UnityEngine.GraphicsBuffer;
-using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor.Experimental.GraphView;
 
 public class LevelEditorWindow : EditorWindow
 {
@@ -12,6 +12,7 @@ public class LevelEditorWindow : EditorWindow
     private LevelData _levelData;
     private const int _defaultTileWidth = 32;
     private int _levelCount;
+    private Vector2 _busColorScrollPos;
 
     public static LevelEditorWindow OpenWindow(LevelEditor editor)
     {
@@ -24,8 +25,17 @@ public class LevelEditorWindow : EditorWindow
 
     private void CreateGUI()
     {
-        Load();
+        if (_levelEditor == null)
+        {
+            LevelEditor editor = FindFirstObjectByType<LevelEditor>();
+            if (editor == null)
+            {
+                return;
+            }
+            _levelEditor = editor;
+        }
         _levelEditor.Initialize();
+        Load();
     }
 
     private void Load()
@@ -35,6 +45,8 @@ public class LevelEditorWindow : EditorWindow
 
     private void OnGUI()
     {
+        if (_levelEditor == null) return;
+
         string levelName;
 
         int currentLevelIndex = _levelData == null ? -1 : _levelData.level_number - 1;
@@ -63,15 +75,25 @@ public class LevelEditorWindow : EditorWindow
 
                 _levelEditor.SetupLevel(_levelData);
             }
-
             GUI.backgroundColor = Color.white;
 
             GUILayout.Space(10);
 
             if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Trash"), GUILayout.Width(40)))
+            {
                 DeleteLevel(i);
-            else 
                 EditorGUILayout.EndHorizontal();
+                return;
+            }
+            else
+            {
+                EditorGUILayout.EndHorizontal();
+            }
+
+            if (isCurrentLevel)
+            {
+                DrawBusEdit();
+            }
         }
 
         if (_levelData == null)
@@ -86,6 +108,53 @@ public class LevelEditorWindow : EditorWindow
             AddNewLevel();
 
         GUI.backgroundColor = Color.white;
+    }
+
+    private void DrawBusEdit()
+    {
+        _busColorScrollPos = EditorGUILayout.BeginScrollView(
+            _busColorScrollPos,
+            GUI.skin.horizontalScrollbar,
+            new GUIStyle(),
+            GUILayout.Height(60)
+        );
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Busses: ", GUILayout.Width(60));
+
+        List<GameLogicColor> colors = _levelData.busColors.ToList();
+
+        if (GUILayout.Button(EditorGUIUtility.IconContent("Toolbar Plus"), GUILayout.Width(40)))
+        {
+            colors.Add(GameLogicColor.Red);
+            _levelData.busColors = colors.ToArray();
+        }
+
+        for (int i = 0; i < _levelData.busColors.Length; i++)
+        {
+            GUI.color = LevelEditor.ColorDatabase.GetColorConfig(_levelData.busColors[i]).color * 3;
+            if (GUILayout.Button("", GUILayout.Width(40), GUILayout.Height(40)))
+            {
+                ColorPicker colorPicker = GetWindow<ColorPicker>();
+                colorPicker.ColorPickComplete += OnColorPick;
+                colorPicker.PickColor(i);
+            }
+            GUI.color = Color.white;
+
+            if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Trash"), GUILayout.Width(40)))
+            {
+                colors.RemoveAt(i);
+                _levelData.busColors = colors.ToArray();
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndScrollView();
+                Repaint();
+                return;
+            }
+
+            GUILayout.Space(10);
+        }
+
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndScrollView();
     }
 
     private void AddNewLevel()
@@ -120,6 +189,7 @@ public class LevelEditorWindow : EditorWindow
         {
             if (_levelData.level_number == (levelIndex + 1))
             {
+                _levelData = null;
                 _levelEditor.UnloadLevel();
             }
             else if (_levelData.level_number > levelIndex + 1)
@@ -153,8 +223,6 @@ public class LevelEditorWindow : EditorWindow
         levelCount.levelCount = _levelCount - 1;
         EditorUtility.SetDirty(levelCount);
         AssetDatabase.SaveAssetIfDirty(levelCount);
-        EditorGUILayout.EndHorizontal();
-        GUILayout.EndScrollView();
 
         Load();
         Repaint();
@@ -164,11 +232,19 @@ public class LevelEditorWindow : EditorWindow
     private void SaveLevel()
     {
         int levelNumber = _levelData.level_number;
-        _levelData = _levelEditor.GetLevelData();
+        LevelData dataWithoutBusColors = _levelEditor.GetLevelData();
+        dataWithoutBusColors.busColors = _levelData.busColors.ToArray();
+        _levelData = dataWithoutBusColors;
         _levelData.level_number = levelNumber;
         File.WriteAllText(GetLevelPath(_levelData.level_number), EditorJsonUtility.ToJson(_levelData));
 
         AssetDatabase.Refresh();
+    }
+
+    private void OnColorPick(GameLogicColor color, int index)
+    {
+        _levelData.busColors[index] = color;
+        Repaint();
     }
 
     private static string GetLevelPath(int levelNumber) => "Assets/Resources/Levels/level_" + (levelNumber) + ".json";

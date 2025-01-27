@@ -10,6 +10,7 @@ public class ColorDatabase : ScriptableObject
     [Serializable]
     public class ColorConfig
     {
+        public Color color;
         public GameLogicColor gameLogicColor;
         public Material passiveCharMat;
         public Material activeCharMat;

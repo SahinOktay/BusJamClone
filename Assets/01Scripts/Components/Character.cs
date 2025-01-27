@@ -23,7 +23,8 @@ public class Character : BaseTileOccupier
 #if UNITY_EDITOR
     public void OnValidate()
     {
-        Setup(LevelEditor.ColorDatabase.GetColorConfig(this.color));
+        if (LevelEditor.Initialized)
+            Setup(LevelEditor.ColorDatabase.GetColorConfig(this.color));
     }
 #endif
 }

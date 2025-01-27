@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [InitializeOnLoad]
 public class LevelEditorSceneHandler
@@ -10,6 +11,7 @@ public class LevelEditorSceneHandler
     static LevelEditorSceneHandler()
     {
         EditorSceneManager.sceneOpened += OnSceneOpened;
+        EditorApplication.delayCall += CheckCurrentScene;
     }
 
     private static void OnSceneOpened(UnityEngine.SceneManagement.Scene scene, OpenSceneMode mode)
@@ -25,5 +27,10 @@ public class LevelEditorSceneHandler
         {
             window = LevelEditorWindow.OpenWindow(levelEditor);
         }
+    }
+
+    private static void CheckCurrentScene()
+    {
+        OnSceneOpened(SceneManager.GetActiveScene(), OpenSceneMode.Single);
     }
 }

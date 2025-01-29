@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.456
+      value: 0.044
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_LocalPosition.z
@@ -145,11 +145,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071067
+      value: 0.7072302
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.7071068
+      value: 0.7069834
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_LocalRotation.y
@@ -157,11 +157,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 89.98
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -179,6 +179,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 324e79911eb7e1e48b41212b531e2864, type: 2}
+    - target: {fileID: -5754084199372789682, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     - target: {fileID: 919132149155446097, guid: 11487c85bf47e404c878027e850a1f70, type: 3}
       propertyPath: m_Name
       value: NoEdgeTile (1)

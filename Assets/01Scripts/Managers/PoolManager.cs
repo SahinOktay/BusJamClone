@@ -1,54 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class PoolManager : MonoBehaviour
+public class PoolManager : MonoBehaviour, ISpawnManager
 {
-    [SerializeField] private GameObject tilePrefab;
+    [SerializeField] private GameObject busPrefab;
     [SerializeField] private GameObject characterPrefab;
+    [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject tunnelPrefab;
 
-    private ObjectPool<Character> _characterPool;
-    private ObjectPool<Tile> _tilePool;
-    private ObjectPool<Tunnel> _tunnelPool;
+    private readonly Dictionary<Type, object> _poolMap = new Dictionary<Type, object>();
 
     public void Initialize()
     {
-        _characterPool = new ObjectPool<Character>(() => Instantiate(characterPrefab).GetComponent<Character>(), 10);
-        _tunnelPool = new ObjectPool<Tunnel>(() => Instantiate(characterPrefab).GetComponent<Tunnel>(), 3);
-        _tilePool = new ObjectPool<Tile>(() => Instantiate(characterPrefab).GetComponent<Tile>(), 30);
+        ObjectPool<Character>  characterPool = new ObjectPool<Character>(() => Instantiate(characterPrefab).GetComponent<Character>(), 10);
+        ObjectPool<Tunnel> tunnelPool = new ObjectPool<Tunnel>(() => Instantiate(tunnelPrefab).GetComponent<Tunnel>(), 3);
+        ObjectPool<Tile> tilePool = new ObjectPool<Tile>(() => Instantiate(tilePrefab).GetComponent<Tile>(), 30);
+        ObjectPool<Bus> busPool = new ObjectPool<Bus>(() => Instantiate(busPrefab).GetComponent<Bus>(), 5);
+
+        _poolMap.Add(typeof(Character), characterPool);
+        _poolMap.Add(typeof(Tunnel), tunnelPool);
+        _poolMap.Add(typeof(Tile), tilePool);
+        _poolMap.Add(typeof(Bus), busPool);
     }
 
-    public Character GetCharacter()
+    public T GetElement<T>() where T : MonoBehaviour
     {
-        Character character = _characterPool.Get();
-        return character;
+        return (_poolMap[typeof(T)] as ObjectPool<T>).Get();
     }
 
-    public void RecycleCustomer(Character character)
+    public void RecycleElement<T>(T element) where T : MonoBehaviour
     {
-        _characterPool.Return(character);
-    }
-
-    public Tile GetTile()
-    {
-        Tile tile = _tilePool.Get();
-        return tile;
-    }
-
-    public void RecycleTile(Tile tile)
-    {
-        _tilePool.Return(tile);
-    }
-
-    public Tunnel GetTunnel()
-    {
-        Tunnel tunnel = _tunnelPool.Get();
-        return tunnel;
-    }
-
-    public void RecycleTunnel(Tunnel tunnel)
-    {
-        _tunnelPool.Return(tunnel);
+        element.gameObject.SetActive(false);
+        element.transform.SetParent(null);
+        (_poolMap[typeof(T)] as ObjectPool<T>).Return(element);
     }
 }

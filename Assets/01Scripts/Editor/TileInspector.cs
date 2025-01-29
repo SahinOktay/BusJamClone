@@ -8,25 +8,19 @@ using System.Linq;
 [CustomEditor(typeof(Tile)), CanEditMultipleObjects]
 public class TileInspector : Editor
 {
-    private Tile[] _tiles;
-    public override VisualElement CreateInspectorGUI()
-    {
-        Object[] objects = targets;
-        _tiles = objects.Select(item => item as Tile).ToArray();
-        return base.CreateInspectorGUI();
-    }
+    private Tile[] tiles;
 
     public override void OnInspectorGUI()
     {
+        Object[] objects = targets;
+        tiles = objects.Select(item => item as Tile).ToArray();
+
         EditorGUI.BeginChangeCheck();
         EditorGUILayout.PropertyField(serializedObject.FindProperty("isWalkable"));
         if (EditorGUI.EndChangeCheck())
         {
             serializedObject.ApplyModifiedProperties();
-            for (int i = 0; i < _tiles.Length; i++)
-            {
-                _tiles[i].StatusChange?.Invoke();
-            }
+            tiles[0].StatusChange?.Invoke();
         }
 
         EditorGUILayout.PropertyField(serializedObject.FindProperty("visualConfigurations"));
@@ -40,24 +34,8 @@ public class TileInspector : Editor
         if (EditorGUI.EndChangeCheck())
         {
             serializedObject.ApplyModifiedProperties();
-            for (int i = 0; i < _tiles.Length; i++)
-            {
-                _tiles[i].DestroyOccupier(true);
-                GameObject prefab = LevelEditor.TileOccupantDatabase.GetPrefab(_tiles[i].occupantType);
-
-                if (prefab == null)
-                {
-                    _tiles[i].SetOccupier(null);
-                }
-                else
-                {
-                    _tiles[i].SetOccupier(
-                        ((GameObject)PrefabUtility.InstantiatePrefab(prefab))
-                        .GetComponent<BaseTileOccupier>()
-                    );
-                }
-            }
-
+            for (int i = 0; i < tiles.Length; i++)
+                tiles[i].NeedNewOccupier?.Invoke(tiles[i], tiles[i].occupantType);
         }
     }
 }

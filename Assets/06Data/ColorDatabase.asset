@@ -17,39 +17,39 @@ MonoBehaviour:
     gameLogicColor: 0
     passiveCharMat: {fileID: 2100000, guid: b905cbda029aa7249bd731317be75c45, type: 2}
     activeCharMat: {fileID: 2100000, guid: 87431e71295295c48bc626508ba75af2, type: 2}
-    busMat: {fileID: 0}
+    busMat: {fileID: 2100000, guid: ad7ffd09703d0dd48bceead95d311663, type: 2}
   - color: {r: 0.30744192, g: 1, b: 0.20392156, a: 1}
     gameLogicColor: 1
     passiveCharMat: {fileID: 2100000, guid: 04c565d4bcb23dd43b2d5ebd4b079f2c, type: 2}
     activeCharMat: {fileID: 2100000, guid: e16eb4ffd8e514d46814307a4e28e6fd, type: 2}
-    busMat: {fileID: 0}
+    busMat: {fileID: 2100000, guid: 3c2ea7e267f74604f853893d5270a728, type: 2}
   - color: {r: 0.20392156, g: 0.76139134, b: 1, a: 1}
     gameLogicColor: 2
     passiveCharMat: {fileID: 2100000, guid: a61c48d6ee4ca8641a59b6ecb8e4f26d, type: 2}
     activeCharMat: {fileID: 2100000, guid: 5edae5dd1c3c40548aad32e9f31a8000, type: 2}
-    busMat: {fileID: 0}
+    busMat: {fileID: 2100000, guid: 9057d14502fcb324cbc40544fd533848, type: 2}
   - color: {r: 0.53900003, g: 0.23769566, b: 0.103782594, a: 1}
     gameLogicColor: 3
     passiveCharMat: {fileID: 2100000, guid: 4a81893c9c82db040ae81f754cc04f99, type: 2}
     activeCharMat: {fileID: 2100000, guid: 1430d7cc0f8840a4ba85cd7f6a244234, type: 2}
-    busMat: {fileID: 0}
+    busMat: {fileID: 2100000, guid: eed9dfcfcdc489740812a3849653a575, type: 2}
   - color: {r: 1, g: 0.9676375, b: 0, a: 1}
     gameLogicColor: 4
     passiveCharMat: {fileID: 2100000, guid: 8023405c108230b448b6948fcb85d753, type: 2}
     activeCharMat: {fileID: 2100000, guid: c222d83cbefdb7d40b83caa6b341e640, type: 2}
-    busMat: {fileID: 0}
+    busMat: {fileID: 2100000, guid: 668fb58745313c1429f256d6824db4d3, type: 2}
   - color: {r: 1, g: 0.20392156, b: 0.9608697, a: 1}
     gameLogicColor: 5
     passiveCharMat: {fileID: 2100000, guid: bbd71896a06cda74b934917405615629, type: 2}
     activeCharMat: {fileID: 2100000, guid: 4b09f2a68b10cc34a9a957b3172ac0eb, type: 2}
-    busMat: {fileID: 0}
+    busMat: {fileID: 2100000, guid: 68dcb6d4d9d5a434eb3ace4a5ecd40d4, type: 2}
   - color: {r: 1, g: 0.4451502, b: 0, a: 1}
     gameLogicColor: 6
     passiveCharMat: {fileID: 2100000, guid: 9a08d37cc06db6e4d8e3a056cb4703e9, type: 2}
     activeCharMat: {fileID: 2100000, guid: 3bcfa44271261774f846641a0beb633c, type: 2}
-    busMat: {fileID: 0}
+    busMat: {fileID: 2100000, guid: 532735309304d7340bd3075c4117f833, type: 2}
   - color: {r: 0, g: 1, b: 0.72214794, a: 1}
     gameLogicColor: 7
     passiveCharMat: {fileID: 2100000, guid: 33f0ecab0ed25254cbcbf7c3720edf52, type: 2}
     activeCharMat: {fileID: 2100000, guid: 1108136095d70e241802933e58203cfb, type: 2}
-    busMat: {fileID: 0}
+    busMat: {fileID: 2100000, guid: 2ac3ef2abc3d5484c91c8b8dcf4af745, type: 2}

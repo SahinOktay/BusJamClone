@@ -96,6 +96,7 @@ public class LevelEditorWindow : EditorWindow
 
             if (isCurrentLevel)
             {
+                _levelData.duration = EditorGUILayout.FloatField("Duration", _levelData.duration);
                 DrawGridDimentionFields();
                 DrawBusEdit();
             }
@@ -107,7 +108,7 @@ public class LevelEditorWindow : EditorWindow
         GUI.backgroundColor = new Color(2, .9f, 0, 1);
 
         if (_levelData != null && GUILayout.Button("Save Changes"))
-            SaveLevel();
+            SaveLevel(false);
 
         if (GUILayout.Button("Add New Level"))
             AddNewLevel();
@@ -140,8 +141,10 @@ public class LevelEditorWindow : EditorWindow
             {
                 _dimensionsChanged = false;
 
+                SaveLevel(false);
                 _levelData.Resize(_newDimensions);
                 _levelEditor.SetupLevel(_levelData);
+                SaveLevel(false);
             }
         }
         EditorGUILayout.EndHorizontal();
@@ -219,7 +222,7 @@ public class LevelEditorWindow : EditorWindow
 
         _levelData = generatedData;
 
-        SaveLevel();
+        SaveLevel(true);
     }
 
     private void DeleteLevel(int levelIndex)
@@ -270,12 +273,21 @@ public class LevelEditorWindow : EditorWindow
         return;
     }
 
-    private void SaveLevel()
+    private void SaveLevel(bool isNewLevel)
     {
+        if (isNewLevel) 
+        {
+            File.WriteAllText(GetLevelPath(_levelData.level_number), EditorJsonUtility.ToJson(_levelData));
+
+            AssetDatabase.Refresh();
+            return;
+        }
+
         int levelNumber = _levelData.level_number;
-        LevelData dataWithoutBusColors = _levelEditor.GetLevelData();
-        dataWithoutBusColors.busColors = _levelData.busColors.ToArray();
-        _levelData = dataWithoutBusColors;
+        LevelData dataFromScene = _levelEditor.GetLevelData();
+        dataFromScene.busColors = _levelData.busColors.ToArray();
+        dataFromScene.duration = _levelData.duration;
+        _levelData = dataFromScene;
         _levelData.level_number = levelNumber;
         File.WriteAllText(GetLevelPath(_levelData.level_number), EditorJsonUtility.ToJson(_levelData));
 

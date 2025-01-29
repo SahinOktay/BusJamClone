@@ -4,9 +4,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class Character : BaseTileOccupier, IInteractable
 {
+    [SerializeField] private Animator characterAnimator;
     [SerializeField] private Collider mCollider;
     [SerializeField] private GameLogicColor color;
     [SerializeField] private Renderer mainRenderer;
@@ -21,6 +23,10 @@ public class Character : BaseTileOccupier, IInteractable
 
     public void Setup(ColorDatabase.ColorConfig colorConfig)
     {
+        transform.forward = Vector3.forward;
+        OutOfGrid = null;
+        PlayerInteracted = null;
+
         color = colorConfig.gameLogicColor;
         _currentColorConfig = colorConfig;
 
@@ -43,27 +49,46 @@ public class Character : BaseTileOccupier, IInteractable
         mCollider.enabled = false;
     }
 
+    public void Move(Vector3 pos)
+    {
+        characterAnimator.Play(Constants.Animations.Run, 0, 0);
+        transform.DOMove(
+            pos,
+            Vector3.Distance(pos, transform.position) / Constants.Numbers.CharacterSpeed
+        ).SetEase(Ease.Linear).OnComplete(() => { characterAnimator.Play(Constants.Animations.Idle, 0, 0); });
+    }
+
     public void MoveToWaitingSpot(WaitingSpot spot)
     {
+        characterAnimator.Play(Constants.Animations.Run, 0, 0);
         Vector3 spotPos = spot.transform.position;
+        transform.forward = spotPos - transform.position;
         transform.DOMove(
             spotPos,
             Vector3.Distance(spotPos, transform.position) / Constants.Numbers.CharacterSpeed
-        ).SetEase(Ease.Linear);
+        ).SetEase(Ease.Linear).OnComplete(() => {
+            transform.forward = Vector3.forward;
+            characterAnimator.Play(Constants.Animations.Idle, 0, 0); 
+        });
     }
 
-    public void MoveToBus(Bus bus)
+    public void MoveToBus(Bus bus, Vector3 pos)
     {
-        Vector3 busPos = bus.transform.position;
+        transform.forward = pos - transform.position;
+        characterAnimator.Play(Constants.Animations.Run, 0, 0);
         transform.DOMove(
-            busPos, 
-            Vector3.Distance(busPos, transform.position) / Constants.Numbers.CharacterSpeed
-        ).SetEase(Ease.Linear).OnComplete(() => { bus.OnCharacterReached(this); });
+            pos, 
+            Vector3.Distance(pos, transform.position) / Constants.Numbers.CharacterSpeed
+        ).SetEase(Ease.Linear).OnComplete(() => { 
+            bus.OnCharacterReached(this);
+            characterAnimator.Play(Constants.Animations.Sit, 0, 0);
+        });
     }
 
     public void WalkOutOfGrid(List<Vector3> positions)
     {
         mCollider.enabled = false;
+        mainRenderer.material = _currentColorConfig.passiveCharMat;
 
         float timeBetweenTiles = 0f;
         float delay = 0;
@@ -76,12 +101,18 @@ public class Character : BaseTileOccupier, IInteractable
             return;
         }
 
+        characterAnimator.Play(Constants.Animations.Run, 0, 0);
         for (int i = 1; i < positions.Count; i++)
         {
             timeBetweenTiles = Vector3.Distance(positions[i], positions[i - 1]) / Constants.Numbers.CharacterSpeed;
 
             var tween = transform.DOMove(positions[i], timeBetweenTiles)
                 .SetEase(Ease.Linear).SetDelay(delay).From(positions[i - 1]);
+
+            tween.OnUpdate(() =>
+            {
+                transform.forward = tween.endValue - transform.position;
+            });
 
             delay += timeBetweenTiles;
 

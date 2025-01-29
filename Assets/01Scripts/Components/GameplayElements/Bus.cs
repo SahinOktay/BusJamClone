@@ -21,6 +21,9 @@ public class Bus : MonoBehaviour
 
     public void Initialize(ColorDatabase.ColorConfig colorConfig)
     {
+        _reservedSeatCount = 0;
+        BusArrived = null;
+        BusFull = null;
         _satCharacters.Clear();
         _color = colorConfig.gameLogicColor;
         for (int i = 0; i < renderers.Length; i++)
@@ -31,21 +34,17 @@ public class Bus : MonoBehaviour
 
     public void Move(Vector3 pos, float startDelay = 0)
     {
-        transform.DOMove(pos, 1f).SetEase(Ease.InOutCubic).SetDelay(startDelay)
+        transform.DOMove(pos, .25f).SetEase(Ease.InOutCubic).SetDelay(startDelay)
             .OnComplete(() => { BusArrived?.Invoke(this); });
     }
 
-    public void MoveOutOfScreenAndRecycle(ISpawnManager spawnManager)
+    public void MoveOutOfScreen()
     {
-        transform.DOMove(transform.position + Vector3.right * 25, 1.5f).SetEase(Ease.InCubic)
+        transform.DOMove(transform.position + Vector3.right * 25, .5f).SetEase(Ease.InCubic)
             .OnComplete(
             () => 
             { 
-                spawnManager.RecycleElement(this);
-                for (int i = 0; i < _satCharacters.Count; i++)
-                {
-                    spawnManager.RecycleElement(_satCharacters[i]);
-                }
+                gameObject.SetActive(false);
             }
         );
     }
@@ -54,7 +53,7 @@ public class Bus : MonoBehaviour
     {
         if (_reservedSeatCount >= seats.Length) return false;
 
-        character.MoveToBus(this);
+        character.MoveToBus(this, new Vector3(0, 0, transform.position.z));
         _reservedSeatCount++;
         return true;
     }
@@ -64,6 +63,7 @@ public class Bus : MonoBehaviour
         _satCharacters.Add(character);
         character.transform.SetParent(seats[_satCharacters.Count - 1].transform);
         character.transform.localPosition = Vector3.zero;
+        character.transform.forward = character.transform.parent.forward;
 
         if (_satCharacters.Count == seats.Length)
         {

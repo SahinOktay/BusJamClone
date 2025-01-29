@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.InputSystem.XInput;
+using UnityEngine.InputSystem.XR;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private InputController inputController;
     [SerializeField] private LevelController levelController;
     [SerializeField] private PoolManager poolManager;
+    [SerializeField] private UIController uIController;
 
     private int _currentLevel;
     private int _levelCount;
@@ -18,6 +20,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         poolManager.Initialize();
+        uIController.Initialize();
         inputController.Initialize(mainCam);
 
         _currentLevel = PlayerPrefs.GetInt(Constants.Prefs.NextLevel, 1);

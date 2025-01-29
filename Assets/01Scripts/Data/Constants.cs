@@ -6,6 +6,13 @@ namespace Rollic
 {
     public static class Constants
     {
+        public static class Animations
+        {
+            public const string Idle = "Idle";
+            public const string Run = "Run";
+            public const string Sit = "Sit";
+        }
+
         public static class InputActions
         {
             public const string Tap = "Tap";

@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class SceneSetter : MonoBehaviour
 {
+    [SerializeField] private Camera mainCam;
     [SerializeField] private ColorDatabase colorDatabase;
     [SerializeField] private Transform levelParent;
     [SerializeField] private Transform fillerLeft;
@@ -75,8 +76,16 @@ public class SceneSetter : MonoBehaviour
             }
 
             currentTunel = spawnManager.GetElement<Tunnel>();
+            currentTunel.coordinates = levelData.tunnels[i].coordinates;
 
-            currentTunel.Setup(levelData.tunnels[i].direction, tunnelCharacters);
+            currentTunel.Setup(
+                levelData.tunnels[i].direction, 
+                tunnelCharacters, 
+                levelComponents.grid.GetTile(
+                    currentTunel.coordinates + LevelController.allDirections[(int)levelData.tunnels[i].direction]
+                ),
+                mainCam
+            );
             spawnedTunnels.Add(currentTunel);
 
             levelComponents.grid.GetTile(levelData.tunnels[i].coordinates, out Tile tile);

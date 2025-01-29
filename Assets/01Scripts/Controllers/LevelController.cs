@@ -7,7 +7,7 @@ using System.Linq;
 
 public class LevelController : MonoBehaviour
 {
-    private static Vector2Int[] allDirections = new Vector2Int[] {
+    public static Vector2Int[] allDirections = new Vector2Int[] {
         Vector2Int.down, Vector2Int.right, Vector2Int.up, Vector2Int.left
     };
 
@@ -15,17 +15,18 @@ public class LevelController : MonoBehaviour
     [SerializeField] private InputController inputController;
     [SerializeField] private PoolManager poolManager;
     [SerializeField] private SceneSetter sceneSetter;
+    [SerializeField] private Timer timer;
     [SerializeField] private Transform busEntrance;
     [SerializeField] private WaitingQueueController waitingQueueController;
     [SerializeField] private UIController uIController;
 
-    private bool _busArrived = true;
     private LevelData _levelData;
     private LevelComponents _levelComponents;
     private Vector3 _busEntrancePos;
     private readonly Queue<Bus> _busses = new Queue<Bus>();
+    private Bus[] _allBusses;
 
-    public Action LevelComplete, LevelFail, TryAgain, NextLevel;
+    public Action LevelComplete, TryAgain, NextLevel;
 
     public void InitializeLevel(int level)
     {
@@ -54,12 +55,13 @@ public class LevelController : MonoBehaviour
             spawnedBus.Initialize(colorDatabase.GetColorConfig(_levelData.busColors[i]));
             spawnedBus.Move(
                 _busEntrancePos + Vector3.left * (i * Constants.Numbers.BusLength), 
-                i * .5f
+                i * .25f
             );
         }
+        _busses.Peek().BusFull += OnBusFull;
+        _allBusses = _busses.ToArray();
 
         inputController.Tap += StartGame;
-        _busses.Peek().BusFull += OnBusFull;
         uIController.ShowTapToPlay();
         uIController.ShowHud(_levelData.level_number, Mathf.FloorToInt(_levelData.duration));
     }
@@ -69,6 +71,8 @@ public class LevelController : MonoBehaviour
         inputController.Tap -= StartGame;
         SetMovableCharacters();
         uIController.HideTapToPlay();
+        timer.CountDownComplete += OnCountDownEnded;
+        timer.CountDown(_levelData.duration);
     }
 
     private void SetMovableCharacters()
@@ -165,6 +169,8 @@ public class LevelController : MonoBehaviour
                 {
                     if (!nextTile.isWalkable || nextTile.occupantType != OccupantType.Empty) continue;
 
+                    OptimizePath(path, next);
+
                     comeFrom = -allDirections[i];
                     current = next;
                     path.Add(current);
@@ -182,22 +188,41 @@ public class LevelController : MonoBehaviour
         return path;
     }
 
+    private void OptimizePath(List<Vector2Int> path, Vector2Int newTile)
+    {
+        for (int i = 0; i < path.Count - 1; i++)
+        {
+            if (Mathf.Abs(path[i].x - newTile.x) + Mathf.Abs(path[i].y - newTile.y) == 1)
+            {
+                path.RemoveRange(i + 1, path.Count - (i + 1));
+                break;
+            }
+        }
+    }
+
+    private void OnCountDownEnded()
+    {
+        uIController.ShowLoseScreen(_levelData.level_number);
+        uIController.TryAgainClick += OnTryAgain;
+    }
+
     private void OnBusArrived(Bus bus)
     {
         bus.BusArrived -= OnBusArrived;
         waitingQueueController.NewBusArrived(bus);
-        _busArrived = true;
     }
 
     private void OnBusFull(Bus bus)
     {
         bus.BusFull -= OnBusFull;
-        _busses.Dequeue().MoveOutOfScreenAndRecycle(poolManager);
-        _busArrived = false;
+        _busses.Dequeue().MoveOutOfScreen();
 
         if (_busses.Count == 0)
         {
-            // TODO: WIN
+            timer.Stop();
+            LevelComplete?.Invoke();
+            uIController.NextLevelClick += OnNextLevel;
+            uIController.ShowWinScreen(_levelData.level_number);
             return;
         }
 
@@ -208,6 +233,7 @@ public class LevelController : MonoBehaviour
                 _busEntrancePos + Vector3.left * (index * Constants.Numbers.BusLength),
                 (index + 1) * .5f
             );
+            index++;
         }
 
         _busses.Peek().BusFull += OnBusFull;
@@ -217,27 +243,48 @@ public class LevelController : MonoBehaviour
     private void OnCharacterOutOfGrid(Character character)
     {
         character.OutOfGrid -= OnCharacterOutOfGrid;
+        bool foundPlace = false;
         if (character.LogicColor == _busses.Peek().LogicColor)
         {
-            if (!_busses.Peek().ReserveSeat(character))
+            foundPlace = _busses.Peek().ReserveSeat(character);
+            if (!foundPlace)
             {
-                waitingQueueController.AddCharacter(character);
+                foundPlace = waitingQueueController.AddCharacter(character);
             }
         }
         else
         {
-            waitingQueueController.AddCharacter(character);
+            foundPlace = waitingQueueController.AddCharacter(character);
+        }
+
+        if (!foundPlace)
+        {
+            timer.Stop();
+            uIController.ShowLoseScreen(_levelData.level_number);
+            uIController.TryAgainClick += OnTryAgain;
         }
     }
 
+    private void OnNextLevel()
+    {
+        uIController.HideResultScreens();
+        uIController.NextLevelClick -= OnNextLevel;
+        NextLevel?.Invoke();
+    }
+
+    private void OnTryAgain()
+    {
+        uIController.HideResultScreens();
+        uIController.TryAgainClick -= OnTryAgain;
+        TryAgain?.Invoke();
+    }
 
     private void TapOnCharacter(Character character)
     {
-        if (!_busArrived) return;
-
         List<Vector2Int> tilePath = FindPathToBus(character.coordinates);
         List<Vector3> worldPath = tilePath.Select(item => _levelComponents.grid.GetTile(item).transform.position).ToList();
 
+        character.OutOfGrid -= OnCharacterOutOfGrid;
         character.OutOfGrid += OnCharacterOutOfGrid;
         character.WalkOutOfGrid(worldPath);
 
@@ -246,6 +293,27 @@ public class LevelController : MonoBehaviour
 
     public void UnloadLevel()
     {
+        for (int i = 0; i < _levelComponents.characters.Length; i++)
+        {
+            poolManager.RecycleElement(_levelComponents.characters[i]);
+        }
 
+        for (int i = 0; i < _levelComponents.tunnels.Length; i++)
+        {
+            poolManager.RecycleElement(_levelComponents.tunnels[i]);
+        }
+
+        for (int i = 0; i < _levelComponents.grid.tiles.Length; i++)
+        {
+            poolManager.RecycleElement(_levelComponents.grid.tiles[i]);
+        }
+
+        if (_allBusses != null)
+        {
+            for (int i = 0; i < _allBusses.Length; i++)
+            {
+                poolManager.RecycleElement(_allBusses[i]);
+            }
+        }
     }
 }

@@ -21,11 +21,11 @@ public class InputController : MonoBehaviour
 
     private void OnTap(InputAction.CallbackContext context)
     {
-        Tap?.Invoke();
         Ray ray = _mainCam.ScreenPointToRay(context.ReadValue<Vector2>());
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
         {
             hit.collider.GetComponent<IInteractable>()?.GetInteracted();
         }
+        Tap?.Invoke();
     }
 }

@@ -15,6 +15,6 @@ public class HudPanel : Panel
 
     public void SetTimer(int seconds)
     {
-        timerText.text = seconds.ToString();
+        timerText.text = seconds.ToString() + 's';
     }
 }

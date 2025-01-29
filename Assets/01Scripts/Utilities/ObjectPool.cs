@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,6 +37,7 @@ public class ObjectPool<T> where T : MonoBehaviour
         if (obj == null)
             throw new ArgumentNullException(nameof(obj));
 
+        obj.transform.DOKill();
         obj.gameObject.SendMessage("ResetObject", options: SendMessageOptions.DontRequireReceiver);
         obj.gameObject.SetActive(false);
         _pool.Push(obj);

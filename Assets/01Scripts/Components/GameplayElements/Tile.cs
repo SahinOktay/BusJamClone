@@ -28,6 +28,7 @@ public class Tile : MonoBehaviour
     [HideInInspector, SerializeField] private BaseTileOccupier tileOccupier;
 
     public Action StatusChange;
+    public Action<Tile> GotEmpty;
     public Action<Tile, OccupantType> NeedNewOccupier;
 
     public BaseTileOccupier Occupier => tileOccupier;
@@ -83,5 +84,6 @@ public class Tile : MonoBehaviour
     {
         occupier.LeftTile -= OnOccupierLeft;
         occupantType = OccupantType.Empty;
+        GotEmpty?.Invoke(this);
     }
 }
